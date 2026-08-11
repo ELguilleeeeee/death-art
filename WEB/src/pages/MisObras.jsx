@@ -28,7 +28,7 @@ export default function MisObras() {
     const obtenerObras = () => {
 
         fetch(
-            `http://localhost:5000/obras-artista/${usuario.id}`
+            `https://death-art.onrender.com/obras-artista/${usuario.id}`
         )
 
         .then(res => res.json())
@@ -135,7 +135,7 @@ export default function MisObras() {
 
                                         <img
 
-                                            src={`http://localhost:5000/uploads/obras/${obra.imagen}`}
+                                            src={`https://death-art.onrender.com/uploads/obras/${obra.imagen}`}
 
                                             alt={obra.titulo}
 

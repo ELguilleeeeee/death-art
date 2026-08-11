@@ -70,7 +70,7 @@ export default function ModalNuevaObra({
 
             const response=await fetch(
 
-                "http://localhost:5000/obras",
+                "https://death-art.onrender.com/obras",
 
                 {
 

@@ -30,7 +30,7 @@ export default function Chat() {
 
   const obtenerArtista = () => {
 
-    fetch(`http://localhost:5000/artista/${id}`)
+    fetch(`https://death-art.onrender.com/artista/${id}`)
 
       .then(res => res.json())
 
@@ -48,7 +48,7 @@ export default function Chat() {
 
     fetch(
 
-      `http://localhost:5000/chat/${usuario.id}/${id}`
+      `https://death-art.onrender.com/chat/${usuario.id}/${id}`
 
     )
 
@@ -72,7 +72,7 @@ export default function Chat() {
 
       const response = await fetch(
 
-        "http://localhost:5000/mensajes",
+        "https://death-art.onrender.com/mensajes",
 
         {
 

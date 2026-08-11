@@ -26,7 +26,7 @@ obtenerMensajes();
 const obtenerMensajes=()=>{
 
 fetch(
-`http://localhost:5000/mensajes/${usuario.id}`
+`https://death-art.onrender.com/mensajes/${usuario.id}`
 )
 
 .then(res=>res.json())
@@ -50,7 +50,7 @@ const responder=async()=>{
 if(!respuesta.trim()) return;
 
 await fetch(
-"http://localhost:5000/mensajes",
+"https://death-art.onrender.com/mensajes",
 {
 
 method:"POST",

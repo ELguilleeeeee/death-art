@@ -16,7 +16,7 @@ export default function ArtistasAdmin() {
 
   const obtenerArtistas = () => {
 
-    fetch("http://localhost:5000/artistas-pendientes")
+    fetch("https://death-art.onrender.com/artistas-pendientes")
 
       .then(res => res.json())
 
@@ -32,7 +32,7 @@ export default function ArtistasAdmin() {
 
     const response=await fetch(
 
-      `http://localhost:5000/aprobar-artista/${id}`,
+      `https://death-art.onrender.com/aprobar-artista/${id}`,
 
       {
 
@@ -56,7 +56,7 @@ export default function ArtistasAdmin() {
 
     const response=await fetch(
 
-      `http://localhost:5000/rechazar-artista/${id}`,
+      `https://death-art.onrender.com/rechazar-artista/${id}`,
 
       {
 

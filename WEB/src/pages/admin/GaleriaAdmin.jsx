@@ -46,7 +46,7 @@ export default function GaleriaAdmin() {
 
   const obtenerGaleria = () => {
 
-    fetch("http://localhost:5000/galeria-mes")
+    fetch("https://death-art.onrender.com/galeria-mes")
 
       .then(res => res.json())
 
@@ -99,8 +99,8 @@ export default function GaleriaAdmin() {
     }
 
     const url = editando
-      ? `http://localhost:5000/galeria-mes/${editando}`
-      : "http://localhost:5000/galeria-mes";
+      ? `https://death-art.onrender.com/galeria-mes/${editando}`
+      : "https://death-art.onrender.com/galeria-mes";
 
     const metodo = editando
       ? "PUT"
@@ -170,7 +170,7 @@ export default function GaleriaAdmin() {
 
     const response = await fetch(
 
-      `http://localhost:5000/galeria-mes/${id}`,
+      `https://death-art.onrender.com/galeria-mes/${id}`,
 
       {
 
@@ -342,7 +342,7 @@ export default function GaleriaAdmin() {
 
               <img
 
-                src={`http://localhost:5000/uploads/galeria/${item.imagen}`}
+                src={`https://death-art.onrender.com/uploads/galeria/${item.imagen}`}
 
                 alt={item.artista}
 

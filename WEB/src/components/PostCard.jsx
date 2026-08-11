@@ -30,7 +30,7 @@ export default function PostCard({ post }) {
 
       const response = await fetch(
 
-        "http://localhost:5000/mensajes",
+        "https://death-art.onrender.com/mensajes",
 
         {
 
@@ -83,7 +83,7 @@ export default function PostCard({ post }) {
             className="avatar"
             src={
               post.foto
-                ? `http://localhost:5000/uploads/perfiles/${post.foto}`
+                ? `https://death-art.onrender.com/uploads/perfiles/${post.foto}`
                 : "/user.png"
             }
             alt={post.nombre}
@@ -109,7 +109,7 @@ export default function PostCard({ post }) {
 
         <img
           className="post-image"
-          src={`http://localhost:5000/uploads/obras/${post.imagen}`}
+          src={`https://death-art.onrender.com/uploads/obras/${post.imagen}`}
           alt={post.titulo}
         />
 

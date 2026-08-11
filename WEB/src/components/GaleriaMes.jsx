@@ -12,7 +12,7 @@ export default function GaleriaMes() {
 
     const mes = new Date().getMonth() + 1;
 
-    fetch(`http://localhost:5000/galeria-mes/${mes}`)
+    fetch(`https://death-art.onrender.com/galeria-mes/${mes}`)
 
       .then(res => {
 
@@ -64,7 +64,7 @@ export default function GaleriaMes() {
 
       <img
 
-        src={`http://localhost:5000/uploads/galeria/${galeria.imagen}`}
+        src={`https://death-art.onrender.com/uploads/galeria/${galeria.imagen}`}
 
         alt={galeria.movimiento}
 

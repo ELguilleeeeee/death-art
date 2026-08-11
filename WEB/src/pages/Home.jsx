@@ -38,7 +38,7 @@ export default function Home() {
 
   const obtenerObras = () => {
 
-    fetch("http://localhost:5000/obras")
+    fetch("https://death-art.onrender.com/obras")
 
       .then(res => res.json())
 

@@ -15,7 +15,7 @@ export default function DashboardAdmin() {
 
     useEffect(()=>{
 
-        fetch("http://localhost:5000/admin/dashboard")
+        fetch("https://death-art.onrender.com/admin/dashboard")
 
         .then(res=>res.json())
 
