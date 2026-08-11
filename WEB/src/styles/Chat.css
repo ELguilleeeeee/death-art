@@ -1,0 +1,178 @@
+.chat-page{
+
+    min-height:100vh;
+
+    background-image:url("../assets/fondo.png");
+    background-repeat:repeat;
+    background-size:200px;
+}
+
+.chat-container{
+
+    width:90%;
+    max-width:900px;
+
+    margin:40px auto;
+
+    background:white;
+
+    border-radius:30px;
+
+    padding:30px;
+
+    box-shadow:
+    0 15px 40px rgba(0,0,0,.35);
+}
+
+.chat-container h1{
+
+    text-align:center;
+
+    color:#102040;
+
+    margin-bottom:20px;
+}
+
+.messages-container{
+
+    height:500px;
+
+    overflow-y:auto;
+
+    background:#f5f5f5;
+
+    border-radius:20px;
+
+    padding:20px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+}
+
+.message{
+
+    max-width:70%;
+
+    padding:15px;
+
+    border-radius:18px;
+
+    font-size:15px;
+
+    animation:fadeIn .3s ease;
+}
+
+.user{
+
+    align-self:flex-end;
+
+    background:#D4AF37;
+
+    color:white;
+}
+
+.artist{
+
+    align-self:flex-start;
+
+    background:#243447;
+
+    color:white;
+}
+
+.chat-input{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-top:20px;
+}
+
+.chat-input input{
+
+    flex:1;
+
+    height:55px;
+
+    border:none;
+
+    border-radius:15px;
+
+    background:#ececec;
+
+    padding-left:15px;
+
+    font-size:16px;
+}
+
+.chat-input button{
+
+    width:140px;
+
+    border:none;
+
+    border-radius:15px;
+
+    cursor:pointer;
+
+    background:#D4AF37;
+
+    color:white;
+
+    font-weight:700;
+
+    transition:.3s;
+}
+
+.chat-input button:hover{
+
+    transform:translateY(-3px);
+
+    background:#b89218;
+}
+
+@keyframes fadeIn{
+
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@media(max-width:768px){
+
+    .chat-input{
+
+        flex-direction:column;
+    }
+
+    .chat-input button{
+
+        width:100%;
+        height:50px;
+    }
+
+    .message{
+
+        max-width:90%;
+    }
+}
+.artist-status{
+
+    text-align:center;
+
+    color:#28a745;
+
+    font-weight:600;
+
+    margin-bottom:20px;
+}

@@ -1,0 +1,170 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Montserrat',sans-serif;
+}
+
+.register-page{
+
+    min-height:100vh;
+
+    background-color:#000;
+
+    background-image:url("../assets/fondo.png");
+    background-repeat:repeat;
+    background-size:350px;
+
+    display:flex;
+    flex-direction:column;
+}
+
+.register-card{
+
+    width:420px;
+
+    max-width:90%;
+
+    margin:auto;
+
+    background:rgba(255,255,255,.96);
+
+    border-radius:28px;
+
+    padding:35px;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:15px;
+
+    box-shadow:
+    0 15px 40px rgba(0,0,0,.45);
+}
+
+.register-card h1{
+
+    text-align:center;
+
+    font-size:52px;
+
+    color:#102040;
+
+    font-weight:800;
+
+    letter-spacing:3px;
+
+    margin-bottom:10px;
+}
+
+.register-card input{
+
+    height:55px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#eef2f8;
+
+    padding-left:18px;
+
+    font-size:16px;
+
+    transition:.3s;
+}
+
+.register-card input:focus{
+
+    outline:none;
+
+    background:white;
+
+    transform:translateY(-2px);
+
+    box-shadow:
+    0 0 0 3px rgba(212,175,55,.3);
+}
+
+.main-btn{
+
+    height:55px;
+
+    border:none;
+
+    border-radius:50px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+    background:linear-gradient(
+    135deg,
+    #D4AF37,
+    #B8860B
+    );
+
+    color:white;
+
+    transition:.3s;
+}
+
+.main-btn:hover{
+
+    transform:
+    translateY(-3px)
+    scale(1.02);
+
+    box-shadow:
+    0 10px 25px rgba(212,175,55,.45);
+}
+
+.link{
+
+    text-align:center;
+
+    text-decoration:none;
+
+    color:#666;
+
+    font-size:14px;
+
+    margin-top:5px;
+}
+
+.link:hover{
+    color:#D4AF37;
+}
+
+@media(max-width:768px){
+
+    .register-card{
+
+        width:90%;
+
+        padding:25px;
+    }
+
+    .register-card h1{
+        font-size:40px;
+    }
+}
+.register-card select{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:12px;
+  margin-bottom:15px;
+  font-size:16px;
+  background:white;
+  outline:none;
+  transition:.3s;
+}
+
+.register-card select:focus{
+  box-shadow:0 0 0 3px rgba(0,153,255,.3);
+}

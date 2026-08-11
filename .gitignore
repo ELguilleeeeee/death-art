@@ -1,0 +1,26 @@
+# Variables privadas
+backend/.env
+WEB/.env
+.env
+
+# Dependencias
+backend/node_modules/
+WEB/node_modules/
+node_modules/
+
+# Builds
+WEB/dist/
+dist/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+# Respaldos de base de datos
+*.sql
+# Certificados
+backend/ca.pem
+*.pem

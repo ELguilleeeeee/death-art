@@ -1,0 +1,101 @@
+.dashboard-admin{
+
+    color:white;
+
+    padding:40px;
+
+}
+
+.dashboard-admin h1{
+
+    margin-bottom:35px;
+
+    color:#d4af37;
+
+}
+
+.cards-dashboard{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+    gap:25px;
+
+}
+
+.card-dashboard{
+
+    background:#1e1e1e;
+
+    border:2px solid #d4af37;
+
+    border-radius:18px;
+
+    padding:30px;
+
+    text-align:center;
+
+    transition:.3s;
+
+}
+
+.card-dashboard:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 10px 25px rgba(0,0,0,.4);
+
+}
+
+.card-dashboard h2{
+
+    font-size:42px;
+
+}
+
+.card-dashboard h3{
+
+    margin-top:15px;
+
+    font-size:38px;
+
+    color:#d4af37;
+
+}
+
+.card-dashboard p{
+
+    margin-top:10px;
+
+    color:#ddd;
+
+}
+
+.actividad{
+
+    margin-top:50px;
+
+    background:#1e1e1e;
+
+    border-radius:18px;
+
+    padding:25px;
+
+}
+
+.actividad h2{
+
+    color:#d4af37;
+
+    margin-bottom:20px;
+
+}
+
+.actividad li{
+
+    margin-bottom:12px;
+
+    color:white;
+
+}

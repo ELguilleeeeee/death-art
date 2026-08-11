@@ -1,0 +1,199 @@
+.artistas-admin{
+
+    padding:40px;
+
+    color:white;
+
+}
+
+.artistas-admin h1{
+
+    margin-bottom:25px;
+
+    color:#d4af37;
+
+    font-size:34px;
+
+}
+
+.buscar{
+
+    width:100%;
+
+    max-width:450px;
+
+    padding:14px 18px;
+
+    border:none;
+
+    border-radius:12px;
+
+    outline:none;
+
+    margin-bottom:35px;
+
+    font-size:16px;
+
+}
+
+.cards-artistas{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+
+    gap:30px;
+
+}
+
+.card-artista{
+
+    background:#1b1b1b;
+
+    border:2px solid #2f2f2f;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    text-align:center;
+
+    transition:.35s;
+
+}
+
+.card-artista:hover{
+
+    transform:translateY(-8px);
+
+    border-color:#d4af37;
+
+    box-shadow:0 12px 25px rgba(0,0,0,.45);
+
+}
+
+.avatar{
+
+    width:110px;
+
+    height:110px;
+
+    margin:auto;
+
+    margin-bottom:20px;
+
+    border-radius:50%;
+
+    background:#2c2c2c;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:55px;
+
+    border:4px solid #d4af37;
+
+}
+
+.card-artista h3{
+
+    color:#d4af37;
+
+    margin-bottom:8px;
+
+}
+
+.card-artista p{
+
+    color:#d9d9d9;
+
+    font-size:15px;
+
+    margin-bottom:18px;
+
+    word-break:break-word;
+
+}
+
+.estado{
+
+    display:inline-block;
+
+    padding:8px 18px;
+
+    border-radius:30px;
+
+    background:#ff9800;
+
+    color:white;
+
+    font-weight:bold;
+
+    margin-bottom:22px;
+
+}
+
+.acciones{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.aprobar{
+
+    background:#2e7d32;
+
+    color:white;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:12px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    font-weight:bold;
+
+}
+
+.aprobar:hover{
+
+    background:#43a047;
+
+}
+
+.rechazar{
+
+    background:#c62828;
+
+    color:white;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:12px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    font-weight:bold;
+
+}
+
+.rechazar:hover{
+
+    background:#e53935;
+
+}

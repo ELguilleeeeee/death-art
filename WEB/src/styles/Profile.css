@@ -1,0 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+.artist-page{
+    
+    min-height:100vh;
+
+    background:#000;
+
+    background-image:url("../assets/fondo.png");
+
+    background-repeat:repeat;
+
+    background-size:350px;
+}
+
+/* HEADER */
+
+
+
+
+
+.artist-logo:hover{
+    transform:scale(1.08);
+}
+
+.artist-user{
+    color:white;
+    font-size:42px;
+}
+
+/* CARD */
+
+.artist-container{
+    width:85%;
+    max-width:1200px;
+
+    margin:40px auto;
+
+    background:#f4f4f4;
+
+    border-radius:45px;
+
+    padding:50px;
+
+    animation:fadeIn .6s ease;
+}
+
+.artist-photo{
+    width:240px;
+    height:240px;
+
+    object-fit:cover;
+
+    display:block;
+    margin:auto;
+
+    border-radius:20px;
+}
+
+.artist-container h1{
+    text-align:center;
+    margin-top:20px;
+
+    color:#0d224f;
+
+    font-size:3rem;
+}
+
+.artist-container h3{
+    text-align:center;
+    color:#444;
+    margin-bottom:40px;
+}
+
+.artist-description{
+    max-width:800px;
+    margin:auto;
+}
+
+.artist-description h2{
+    margin-bottom:15px;
+    color:#0d224f;
+}
+
+.artist-description p{
+    margin-bottom:15px;
+    line-height:1.8;
+    color:#333;
+}
+
+.artist-socials{
+    margin-top:30px;
+
+    display:flex;
+    justify-content:center;
+    gap:25px;
+}
+
+.artist-socials a{
+    text-decoration:none;
+    color:#0d224f;
+    font-weight:600;
+}
+
+.artist-socials a:hover{
+    color:#00a8ff;
+}
+
+.artist-gallery{
+    margin-top:50px;
+
+    display:flex;
+    gap:40px;
+
+    align-items:center;
+}
+
+.gallery-box{
+    width:250px;
+    height:200px;
+
+    background:#d9d9d9;
+
+    border-radius:15px;
+}
+
+.gallery-info{
+    flex:1;
+}
+
+.gallery-info h2{
+    color:#0d224f;
+    margin-bottom:10px;
+}
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* RESPONSIVE */
+
+@media(max-width:768px){
+
+    .artist-container{
+        width:95%;
+        padding:30px;
+    }
+
+    .artist-container h1{
+        font-size:2rem;
+    }
+
+    .artist-gallery{
+        flex-direction:column;
+    }
+
+    .gallery-box{
+        width:100%;
+    }
+
+    .artist-header{
+        padding:0 20px;
+    }
+
+    .artist-logo{
+        height:45px;
+    }
+}
+.contact-btn{
+    margin-top:25px;
+
+    background:#0d224f;
+    color:white;
+
+    border:none;
+
+    padding:15px 30px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.contact-btn:hover{
+    transform:translateY(-3px);
+    background:#132f6b;
+}

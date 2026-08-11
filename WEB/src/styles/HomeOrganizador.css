@@ -1,0 +1,133 @@
+.artista-home{
+
+    min-height:calc(100vh - 170px);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:140px 20px 80px;
+
+}
+
+.artista-card{
+
+    width:100%;
+
+    max-width:900px;
+
+    background:rgba(18,18,18,.92);
+
+    border:1px solid rgba(212,175,55,.25);
+
+    border-radius:25px;
+
+    padding:60px;
+
+    text-align:center;
+
+    backdrop-filter:blur(12px);
+
+    box-shadow:0 15px 40px rgba(0,0,0,.45);
+
+}
+
+.artista-card h1{
+
+    color:white;
+
+    font-size:46px;
+
+    margin-bottom:20px;
+
+    font-weight:700;
+
+}
+
+.artista-card span{
+
+    color:#D4AF37;
+
+}
+
+.artista-card p{
+
+    color:#d8d8d8;
+
+    font-size:18px;
+
+    line-height:1.8;
+
+    max-width:700px;
+
+    margin:auto;
+
+}
+
+.artista-botones{
+
+    margin-top:50px;
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:25px;
+
+}
+
+.artista-botones button{
+
+    background:#D4AF37;
+
+    color:#111;
+
+    border:none;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    font-size:19px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.35s;
+
+}
+
+.artista-botones button:hover{
+
+    transform:translateY(-8px);
+
+    background:#f0c94c;
+
+    box-shadow:0 10px 25px rgba(212,175,55,.45);
+
+}
+
+@media(max-width:850px){
+
+.artista-botones{
+
+grid-template-columns:1fr;
+
+}
+
+.artista-card{
+
+padding:40px 30px;
+
+}
+
+.artista-card h1{
+
+font-size:34px;
+
+}
+
+}

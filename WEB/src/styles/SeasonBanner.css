@@ -1,0 +1,162 @@
+.season-banner{
+
+    width:90%;
+
+    max-width:1200px;
+
+    margin:30px auto;
+
+    padding:30px;
+
+    border-radius:18px;
+
+    color:white;
+
+    text-align:center;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.35);
+
+    transition:.5s ease;
+
+    animation:fadeBanner .8s;
+
+}
+
+.season-banner h1{
+
+    font-size:32px;
+
+    margin-bottom:12px;
+
+    font-weight:700;
+
+}
+
+.season-banner p{
+
+    font-size:18px;
+
+    opacity:.95;
+
+}
+
+/* Año Nuevo */
+
+.newyear{
+
+    background:linear-gradient(
+        135deg,
+        #0f4c81,
+        #3d84b8,
+        #c9a227
+    );
+
+}
+
+/* San Valentín */
+
+.valentine{
+
+    background:linear-gradient(
+        135deg,
+        #ff4b7d,
+        #ff7eb3
+    );
+
+}
+
+/* Primavera */
+
+.spring{
+
+    background:linear-gradient(
+        135deg,
+        #2ecc71,
+        #9be15d
+    );
+
+}
+
+/* Verano */
+
+.summer{
+
+    background:linear-gradient(
+        135deg,
+        #00b4db,
+        #0083b0
+    );
+
+}
+
+/* Septiembre */
+
+.mexico{
+
+    background:linear-gradient(
+        135deg,
+        #006847,
+        white,
+        #ce1126
+    );
+
+    color:#111;
+
+}
+
+/* Halloween */
+
+.halloween{
+
+    background:linear-gradient(
+        135deg,
+        #1f1f1f,
+        #ff7a00
+    );
+
+}
+
+/* Día de Muertos */
+
+.dead{
+
+    background:linear-gradient(
+        135deg,
+        #5b247a,
+        #c06c84,
+        #f67280
+    );
+
+}
+
+/* Navidad */
+
+.christmas{
+
+    background:linear-gradient(
+        135deg,
+        #0d7a36,
+        #c1272d
+    );
+
+}
+
+@keyframes fadeBanner{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(-20px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}

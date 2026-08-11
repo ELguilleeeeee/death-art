@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Evento Navideño",
+    "city": "Querétaro",
+    "category": "Pintura",
+    "description": "Evento en beneficencia",
+    "image": "/imagenes/arte.jpg",
+    "date": "2026-12-15"
+  },
+  {
+    "id": 2,
+    "name": "Obra de teatro",
+    "city": "Querétaro",
+    "category": "Teatro",
+    "description": "Presentación en el Centro Histórico.",
+    "image": "/imagenes/teatro.jpg",
+    "date": "2026-07-20"
+  }
+]
