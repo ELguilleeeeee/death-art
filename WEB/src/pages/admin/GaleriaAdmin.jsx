@@ -342,7 +342,11 @@ export default function GaleriaAdmin() {
 
               <img
 
-                src={`https://death-art.onrender.com/uploads/galeria/${item.imagen}`}
+                src={
+  item.imagen?.startsWith("http")
+    ? item.imagen
+    : `https://death-art.onrender.com/uploads/galeria/${item.imagen}`
+}
 
                 alt={item.artista}
 

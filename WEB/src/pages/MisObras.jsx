@@ -135,7 +135,11 @@ export default function MisObras() {
 
                                         <img
 
-                                            src={`https://death-art.onrender.com/uploads/obras/${obra.imagen}`}
+                                            src={
+  obra.imagen?.startsWith("http")
+    ? obra.imagen
+    : `https://death-art.onrender.com/uploads/obras/${obra.imagen}`
+}
 
                                             alt={obra.titulo}
 

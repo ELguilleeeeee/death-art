@@ -64,7 +64,11 @@ export default function GaleriaMes() {
 
       <img
 
-        src={`https://death-art.onrender.com/uploads/galeria/${galeria.imagen}`}
+        src={
+  galeria.imagen?.startsWith("http")
+    ? galeria.imagen
+    : `https://death-art.onrender.com/uploads/galeria/${galeria.imagen}`
+}
 
         alt={galeria.movimiento}
 

@@ -109,7 +109,11 @@ export default function PostCard({ post }) {
 
         <img
           className="post-image"
-          src={`https://death-art.onrender.com/uploads/obras/${post.imagen}`}
+          src={
+  post.imagen?.startsWith("http")
+    ? post.imagen
+    : `https://death-art.onrender.com/uploads/obras/${post.imagen}`
+}
           alt={post.titulo}
         />
 

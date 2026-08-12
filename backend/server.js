@@ -6,81 +6,90 @@ const bcrypt = require("bcrypt");
 const enviarCorreo = require("./mailer");
 
 const multer = require("multer");
-const path = require("path");
+const { v2: cloudinary } = require("cloudinary");
 
 const app = express();
 
 app.use(cors());
-
 app.use(express.json());
 
 const db = require("./db");
-const storage = multer.diskStorage({
 
-  destination: (req, file, cb) => {
 
-    cb(null, "uploads/galeria");
+// ========================================
+// CONFIGURACIÓN DE CLOUDINARY
+// ========================================
 
-  },
-
-  filename: (req, file, cb) => {
-
-    const nombre =
-
-      Date.now() +
-
-      path.extname(file.originalname);
-
-    cb(null, nombre);
-
-  }
-
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const storageObras = multer.diskStorage({
 
-    destination:(req,file,cb)=>{
+// ========================================
+// CONFIGURACIÓN DE MULTER
+// ========================================
 
-        cb(
-            null,
-            "uploads/obras"
-        );
+// Las imágenes se mantienen temporalmente
+// en memoria y NO se guardan en el disco
+// de Render.
 
-    },
+const storage = multer.memoryStorage();
 
-    filename:(req,file,cb)=>{
-
-        cb(
-
-            null,
-
-            Date.now() +
-
-            path.extname(file.originalname)
-
-        );
-
-    }
-
+const upload = multer({
+  storage: storage
 });
 
 const uploadObra = multer({
-
-    storage:storageObras
-
+  storage: storage
 });
 
-const upload = multer({
 
-  storage
+// ========================================
+// FUNCIÓN PARA SUBIR A CLOUDINARY
+// ========================================
 
-});
+const subirACloudinary = (buffer, carpeta) => {
+
+  return new Promise((resolve, reject) => {
+
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: carpeta,
+        resource_type: "image"
+      },
+      (error, result) => {
+
+        if (error) {
+
+          reject(error);
+          return;
+
+        }
+
+        resolve(result);
+
+      }
+    );
+
+    stream.end(buffer);
+
+  });
+
+};
+
+
+// ========================================
+// ARCHIVOS ANTIGUOS
+// ========================================
+
+// Se conserva temporalmente para imágenes
+// antiguas que todavía existan en /uploads.
+
 app.use(
-
   "/uploads",
-
   express.static("uploads")
-
 );
 
 app.post("/register", async (req, res) => {
@@ -726,77 +735,84 @@ app.get("/galeria-mes", (req, res) => {
 app.post(
   "/galeria-mes",
   upload.single("imagen"),
-  (req, res) => {
+  async (req, res) => {
 
-    const {
+    try {
 
-      mes,
-
-      movimiento,
-
-      artista,
-
-      frase
-
-    } = req.body;
-
-    const imagen = req.file
-      ? req.file.filename
-      : null;
-
-    const sql = `
-      INSERT INTO galeria_mes
-      (
+      const {
         mes,
         movimiento,
         artista,
-        frase,
-        imagen
-      )
-      VALUES (?, ?, ?, ?, ?)
-    `;
+        frase
+      } = req.body;
 
-    db.query(
+      let imagen = null;
 
-      sql,
+      // Si viene una imagen, se sube a Cloudinary
+      if (req.file) {
 
-      [
+        const resultado = await subirACloudinary(
+          req.file.buffer,
+          "death-art/galeria"
+        );
 
-        mes,
-
-        movimiento,
-
-        artista,
-
-        frase,
-
-        imagen
-
-      ],
-
-      (err, result) => {
-
-        if (err) {
-
-          console.log(err);
-
-          return res.status(500).json({
-
-            message: "Error al guardar"
-
-          });
-
-        }
-
-        res.status(201).json({
-
-          message: "Galería guardada correctamente"
-
-        });
+        imagen = resultado.secure_url;
 
       }
 
-    );
+      const sql = `
+        INSERT INTO galeria_mes
+        (
+          mes,
+          movimiento,
+          artista,
+          frase,
+          imagen
+        )
+        VALUES (?, ?, ?, ?, ?)
+      `;
+
+      db.query(
+        sql,
+        [
+          mes,
+          movimiento,
+          artista,
+          frase,
+          imagen
+        ],
+        (err) => {
+
+          if (err) {
+
+            console.log(err);
+
+            return res.status(500).json({
+              message: "Error al guardar la galería"
+            });
+
+          }
+
+          res.status(201).json({
+            message: "Galería guardada correctamente",
+            imagen: imagen
+          });
+
+        }
+      );
+
+    } catch (error) {
+
+      console.log(
+        "Error al subir imagen a Cloudinary:",
+        error
+      );
+
+      res.status(500).json({
+        message: "Error al subir la imagen"
+      });
+
+    }
 
   }
 );
@@ -811,112 +827,157 @@ app.delete("/galeria-mes/:id", (req, res) => {
     WHERE id = ?
   `;
 
-  db.query(sql,[id],(err)=>{
+  db.query(
+    sql,
+    [id],
+    (err, result) => {
 
-    if(err){
+      if (err) {
 
-      console.log(err);
+        console.log(err);
 
-      return res.status(500).json({
-        message:"Error al eliminar"
+        return res.status(500).json({
+          message: "Error al eliminar la galería"
+        });
+
+      }
+
+      if (result.affectedRows === 0) {
+
+        return res.status(404).json({
+          message: "Galería no encontrada"
+        });
+
+      }
+
+      res.json({
+        message: "Galería eliminada correctamente"
       });
 
     }
-
-    res.json({
-      message:"Galería eliminada"
-    });
-
-  });
+  );
 
 });
 
 app.put(
-"/galeria-mes/:id",
-upload.single("imagen"),
-(req,res)=>{
+  "/galeria-mes/:id",
+  upload.single("imagen"),
+  async (req, res) => {
 
-const {id}=req.params;
+    try {
 
-const{
+      const { id } = req.params;
 
-mes,
-movimiento,
-artista,
-frase
+      const {
+        mes,
+        movimiento,
+        artista,
+        frase
+      } = req.body;
 
-}=req.body;
+      let sql;
+      let datos;
 
-let sql;
-let datos;
+      // Si seleccionaron una imagen nueva
+      if (req.file) {
 
-if(req.file){
+        const resultado = await subirACloudinary(
+          req.file.buffer,
+          "death-art/galeria"
+        );
 
-sql=`
-UPDATE galeria_mes
-SET
-mes=?,
-movimiento=?,
-artista=?,
-frase=?,
-imagen=?
-WHERE id=?
-`;
+        const imagen = resultado.secure_url;
 
-datos=[
-mes,
-movimiento,
-artista,
-frase,
-req.file.filename,
-id
-];
+        sql = `
+          UPDATE galeria_mes
+          SET
+            mes = ?,
+            movimiento = ?,
+            artista = ?,
+            frase = ?,
+            imagen = ?
+          WHERE id = ?
+        `;
 
-}else{
+        datos = [
+          mes,
+          movimiento,
+          artista,
+          frase,
+          imagen,
+          id
+        ];
 
-sql=`
-UPDATE galeria_mes
-SET
-mes=?,
-movimiento=?,
-artista=?,
-frase=?
-WHERE id=?
-`;
+      }
 
-datos=[
-mes,
-movimiento,
-artista,
-frase,
-id
-];
+      // Si NO seleccionaron una imagen nueva
+      else {
 
-}
+        sql = `
+          UPDATE galeria_mes
+          SET
+            mes = ?,
+            movimiento = ?,
+            artista = ?,
+            frase = ?
+          WHERE id = ?
+        `;
 
-db.query(sql,datos,(err)=>{
+        datos = [
+          mes,
+          movimiento,
+          artista,
+          frase,
+          id
+        ];
 
-if(err){
+      }
 
-console.log(err);
+      db.query(
+        sql,
+        datos,
+        (err, result) => {
 
-return res.status(500).json({
+          if (err) {
 
-message:"Error"
+            console.log(err);
 
-});
+            return res.status(500).json({
+              message: "Error al actualizar la galería"
+            });
 
-}
+          }
 
-res.json({
+          if (result.affectedRows === 0) {
 
-message:"Galería actualizada"
+            return res.status(404).json({
+              message: "Galería no encontrada"
+            });
 
-});
+          }
 
-});
+          res.json({
+            message: "Galería actualizada correctamente"
+          });
 
-});
+        }
+      );
+
+    } catch (error) {
+
+      console.log(
+        "Error al subir imagen a Cloudinary:",
+        error
+      );
+
+      res.status(500).json({
+        message: "Error al subir la imagen"
+      });
+
+    }
+
+  }
+);
 
 
 
