@@ -21,7 +21,7 @@ export default function SidebarAdmin({
 
     localStorage.removeItem("usuario");
 
-    window.location.href = "/login";
+    navigate("/login", { replace: true });
 
   };
 
