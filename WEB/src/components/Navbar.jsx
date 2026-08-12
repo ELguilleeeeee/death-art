@@ -20,7 +20,7 @@ export default function Navbar({ openSidebar }) {
 
     localStorage.removeItem("usuario");
 
-    window.location.href = "/login";
+    navigate("/login", { replace: true });
 
   };
 
