@@ -1033,42 +1033,36 @@ app.get("/admin/dashboard", (req, res) => {
 
 });
 
+// ========================================
+// OBTENER TODAS LAS OBRAS
+// ========================================
 
 app.get("/obras", (req, res) => {
 
   const sql = `
-
     SELECT
 
       obras.id,
-
       obras.titulo,
-
       obras.descripcion,
-
       obras.categoria,
-
       obras.imagen,
 
       DATE_FORMAT(
-obras.fecha_publicacion,
-'%d/%m/%Y %H:%i'
-) AS fecha,
+        obras.fecha_publicacion,
+        '%d/%m/%Y %H:%i'
+      ) AS fecha,
 
       usuarios.id AS artista_id,
-
       usuarios.nombre,
-
       usuarios.foto
 
     FROM obras
 
     INNER JOIN usuarios
-
       ON obras.artista_id = usuarios.id
 
     ORDER BY obras.fecha_publicacion DESC
-
   `;
 
   db.query(sql, (err, result) => {
@@ -1078,9 +1072,7 @@ obras.fecha_publicacion,
       console.log(err);
 
       return res.status(500).json({
-
         message: "Error al obtener obras"
-
       });
 
     }
@@ -1092,123 +1084,133 @@ obras.fecha_publicacion,
 });
 
 
+// ========================================
+// OBTENER OBRAS DE UN ARTISTA
+// ========================================
 
-app.get("/obras-artista/:id",(req,res)=>{
+app.get("/obras-artista/:id", (req, res) => {
 
-    const {id}=req.params;
+  const { id } = req.params;
 
-    const sql=`
+  const sql = `
+    SELECT *
+    FROM obras
+    WHERE artista_id = ?
+    ORDER BY fecha_publicacion DESC
+  `;
 
-        SELECT *
+  db.query(
+    sql,
+    [id],
+    (err, result) => {
 
-        FROM obras
+      if (err) {
 
-        WHERE artista_id=?
+        console.log(err);
 
-        ORDER BY fecha_publicacion DESC
+        return res.status(500).json({
+          message: "Error al obtener las obras del artista"
+        });
 
-    `;
+      }
 
-    db.query(sql,[id],(err,result)=>{
+      res.json(result);
 
-        if(err){
+    }
+  );
+
+});
+
+
+// ========================================
+// PUBLICAR NUEVA OBRA
+// ========================================
+
+app.post(
+  "/obras",
+  uploadObra.single("imagen"),
+  async (req, res) => {
+
+    try {
+
+      const {
+        titulo,
+        descripcion,
+        categoria,
+        artista_id
+      } = req.body;
+
+      let imagen = null;
+
+      // Si el usuario seleccionó una imagen
+      if (req.file) {
+
+        const resultado = await subirACloudinary(
+          req.file.buffer,
+          "death-art/obras"
+        );
+
+        imagen = resultado.secure_url;
+
+      }
+
+      const sql = `
+        INSERT INTO obras
+        (
+          titulo,
+          descripcion,
+          categoria,
+          imagen,
+          artista_id
+        )
+        VALUES (?, ?, ?, ?, ?)
+      `;
+
+      db.query(
+        sql,
+        [
+          titulo,
+          descripcion,
+          categoria,
+          imagen,
+          artista_id
+        ],
+        (err, result) => {
+
+          if (err) {
 
             console.log(err);
 
             return res.status(500).json({
-                message:"Error"
+              message: "Error al guardar la obra"
             });
 
-        }
+          }
 
-        res.json(result);
-
-    });
-
-});
-
-
-app.post("/obras", uploadObra.single("imagen"), (req, res) => {
-
-    const {
-
-        titulo,
-
-        descripcion,
-
-        categoria,
-
-        artista_id
-
-    } = req.body;
-
-    const imagen = req.file
-        ? req.file.filename
-        : null;
-
-    const sql = `
-
-        INSERT INTO obras(
-
-            titulo,
-
-            descripcion,
-
-            categoria,
-
-            imagen,
-
-            artista_id
-
-        )
-
-        VALUES(?,?,?,?,?)
-
-    `;
-
-    db.query(
-
-        sql,
-
-        [
-
-            titulo,
-
-            descripcion,
-
-            categoria,
-
-            imagen,
-
-            artista_id
-
-        ],
-
-        (err) => {
-
-            if(err){
-
-                console.log(err);
-
-                return res.status(500).json({
-
-                    message:"Error al guardar la obra"
-
-                });
-
-            }
-
-            res.json({
-
-                message:"Obra publicada correctamente"
-
-            });
+          res.status(201).json({
+            message: "Obra publicada correctamente",
+            id: result.insertId,
+            imagen: imagen
+          });
 
         }
+      );
 
-    );
+    } catch (error) {
 
-});
+      console.log(
+        "Error al subir obra a Cloudinary:",
+        error
+      );
+
+      res.status(500).json({
+        message: "Error al subir la imagen de la obra"
+      });
+
+    }
+
+  }
+);
 
 app.post("/mensajes", (req, res) => {
 
