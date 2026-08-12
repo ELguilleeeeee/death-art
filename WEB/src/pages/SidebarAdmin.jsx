@@ -1,4 +1,5 @@
 import "../styles/Sidebar.css";
+import { useNavigate } from "react-router-dom";
 
 export default function SidebarAdmin({
   isOpen,
@@ -6,6 +7,8 @@ export default function SidebarAdmin({
   seccion,
   setSeccion
 }) {
+
+  const navigate = useNavigate();
 
   const usuario = JSON.parse(
     localStorage.getItem("usuario")
@@ -22,20 +25,15 @@ export default function SidebarAdmin({
     localStorage.removeItem("usuario");
 
     navigate("/login", { replace: true });
-
   };
 
   return (
-
     <>
-
       {isOpen && (
-
         <div
           className="sidebar-overlay"
           onClick={closeSidebar}
         />
-
       )}
 
       <div
@@ -68,11 +66,8 @@ export default function SidebarAdmin({
         <button
           className="sidebar-item"
           onClick={() => {
-
             setSeccion("dashboard");
-
             closeSidebar();
-
           }}
         >
           🏠 Dashboard
@@ -81,11 +76,8 @@ export default function SidebarAdmin({
         <button
           className="sidebar-item"
           onClick={() => {
-
             setSeccion("artistas");
-
             closeSidebar();
-
           }}
         >
           🎨 Solicitudes de Artistas
@@ -94,11 +86,8 @@ export default function SidebarAdmin({
         <button
           className="sidebar-item"
           onClick={() => {
-
             setSeccion("galeria");
-
             closeSidebar();
-
           }}
         >
           🖼️ Galería del Mes
@@ -107,11 +96,8 @@ export default function SidebarAdmin({
         <button
           className="sidebar-item"
           onClick={() => {
-
             setSeccion("eventos");
-
             closeSidebar();
-
           }}
         >
           📅 Eventos
@@ -120,11 +106,8 @@ export default function SidebarAdmin({
         <button
           className="sidebar-item"
           onClick={() => {
-
             setSeccion("usuarios");
-
             closeSidebar();
-
           }}
         >
           👥 Usuarios
@@ -133,11 +116,8 @@ export default function SidebarAdmin({
         <button
           className="sidebar-item"
           onClick={() => {
-
             setSeccion("configuracion");
-
             closeSidebar();
-
           }}
         >
           ⚙️ Configuración
@@ -151,9 +131,6 @@ export default function SidebarAdmin({
         </button>
 
       </div>
-
     </>
-
   );
-
 }

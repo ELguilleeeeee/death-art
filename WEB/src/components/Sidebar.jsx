@@ -1,10 +1,12 @@
 import "./../styles/Sidebar.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Sidebar({
   isOpen,
   closeSidebar
 }) {
+
+  const navigate = useNavigate();
 
   const usuario = JSON.parse(
     localStorage.getItem("usuario")
@@ -21,20 +23,15 @@ export default function Sidebar({
     localStorage.removeItem("usuario");
 
     navigate("/login", { replace: true });
-
   };
 
   return (
-
     <>
-
       {isOpen && (
-
         <div
           className="sidebar-overlay"
           onClick={closeSidebar}
         />
-
       )}
 
       <div
@@ -59,7 +56,7 @@ export default function Sidebar({
           to="/home"
           onClick={closeSidebar}
         >
-           Inicio
+          Inicio
         </Link>
 
         <Link
@@ -75,44 +72,37 @@ export default function Sidebar({
           to="/eventos"
           onClick={closeSidebar}
         >
-           Artistas
+          Artistas
         </Link>
 
         {usuario?.tipo === "artista" && (
-
           <Link
             className="sidebar-item"
             to="/mis-obras"
             onClick={closeSidebar}
           >
-             Mis Obras
+            Mis Obras
           </Link>
-
         )}
 
         {usuario?.tipo === "admin" && (
-
           <Link
             className="sidebar-item"
             to="/admin"
             onClick={closeSidebar}
           >
-             Administración
+            Administración
           </Link>
-
         )}
 
         <button
           className="logout-btn"
           onClick={cerrarSesion}
         >
-           Cerrar Sesión
+          Cerrar Sesión
         </button>
 
       </div>
-
     </>
-
   );
-
 }
