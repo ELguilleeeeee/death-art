@@ -27,3 +27,10 @@ backend/ca.pem
 # Archivos locales que no se publican
 pp.txt
 WEB/database.txt
+
+# Credenciales privadas de Firebase
+*-firebase-adminsdk-*.json
+
+# Variables privadas
+.env
+.env.*
