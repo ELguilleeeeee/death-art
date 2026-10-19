@@ -15,6 +15,8 @@ app.use(express.json());
 
 const db = require("./db");
 
+const iniciarFirebase = require("./firebase");
+const firebase = iniciarFirebase();
 
 // ========================================
 // CONFIGURACIÓN DE CLOUDINARY
@@ -1649,6 +1651,89 @@ app.get("/notificaciones/obras", (req, res) => {
         });
     });
 });
+
+ 
+// ========================================
+// DEATH-ART - NOTIFICACIONES SMARTWATCH
+// PRUEBA DE ENVÍO DESDE EL BACKEND
+// ========================================
+
+app.post("/notificaciones/enviar-prueba", async (req, res) => {
+
+    try {
+
+        // Proteger el endpoint de pruebas
+        const clave = req.get("x-notification-secret");
+
+        if (
+            !process.env.NOTIFY_ADMIN_SECRET ||
+            clave !== process.env.NOTIFY_ADMIN_SECRET
+        ) {
+            return res.status(401).json({
+                message: "No autorizado"
+            });
+        }
+
+        if (!firebase) {
+            return res.status(503).json({
+                message: "Firebase no está configurado"
+            });
+        }
+
+        const token = process.env.FCM_TEST_TOKEN;
+
+        if (!token) {
+            return res.status(400).json({
+                message: "Falta configurar el token del reloj"
+            });
+        }
+
+        const mensaje = {
+            token: token,
+            notification: {
+                title: "Death-Art",
+                body: "¡Nueva obra publicada en la galería!"
+            },
+            android: {
+                priority: "high",
+                notification: {
+                    channelId: "death_art_notifications"
+                }
+            },
+            data: {
+                tipo: "nueva_obra",
+                titulo: "Obra de prueba",
+                artista: "Death-Art"
+            }
+        };
+
+        const resultado =
+            await firebase.messaging().send(mensaje);
+
+        console.log(
+            "Notificación enviada a Firebase:",
+            resultado
+        );
+
+        res.json({
+            message: "Firebase aceptó la notificación",
+            resultado: resultado
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Error enviando notificación:",
+            error
+        );
+
+        res.status(500).json({
+            message: "Error al enviar notificación",
+            code: error.code || "unknown"
+        });
+    }
+});
+
 
 
 
