@@ -1736,6 +1736,183 @@ app.post("/notificaciones/enviar-prueba", async (req, res) => {
 
 
 
+ 
+// ========================================
+// NOTIFICACIONES AUTOMATICAS DE DEATH-ART
+// ========================================
+
+let verificacionActiva = false;
+
+function consultaNotificaciones(sql, valores = []) {
+    return new Promise((resolve, reject) => {
+        db.query(sql, valores, (error, resultado) => {
+            if (error) return reject(error);
+            resolve(resultado);
+        });
+    });
+}
+
+app.post("/notificaciones/verificar", async (req, res) => {
+
+    // Seguridad
+    if (
+        !process.env.NOTIFY_ADMIN_SECRET ||
+        req.get("x-notification-secret") !==
+        process.env.NOTIFY_ADMIN_SECRET
+    ) {
+        return res.status(401).json({
+            message: "No autorizado"
+        });
+    }
+
+    if (!firebase) {
+        return res.status(503).json({
+            message: "Firebase no configurado"
+        });
+    }
+
+    if (!process.env.FCM_TEST_TOKEN) {
+        return res.status(503).json({
+            message: "Falta FCM_TEST_TOKEN"
+        });
+    }
+
+    if (verificacionActiva) {
+        return res.status(409).json({
+            message: "Ya hay una verificacion en proceso"
+        });
+    }
+
+    verificacionActiva = true;
+
+    let enviadas = 0;
+
+    try {
+
+        // Crear tabla de seguimiento
+        await consultaNotificaciones(`
+            CREATE TABLE IF NOT EXISTS control_notificaciones (
+                id INT PRIMARY KEY,
+                ultimo_id INT NOT NULL DEFAULT 0
+            )
+        `);
+
+        // Consultar el estado actual
+        let estado = await consultaNotificaciones(`
+            SELECT ultimo_id
+            FROM control_notificaciones
+            WHERE id = 1
+        `);
+
+        // Primera ejecucion: no avisar obras antiguas
+        if (estado.length === 0) {
+
+            await consultaNotificaciones(`
+                INSERT IGNORE INTO control_notificaciones
+                    (id, ultimo_id)
+                SELECT 1, COALESCE(MAX(id), 0)
+                FROM obras
+            `);
+
+            estado = await consultaNotificaciones(`
+                SELECT ultimo_id
+                FROM control_notificaciones
+                WHERE id = 1
+            `);
+
+            return res.json({
+                message: "Sistema inicializado correctamente",
+                ultimo_id: estado[0].ultimo_id,
+                enviadas: 0
+            });
+        }
+
+        const ultimoId = estado[0].ultimo_id;
+
+        // Buscar publicaciones nuevas
+        const obras = await consultaNotificaciones(`
+            SELECT
+                obras.id,
+                obras.titulo,
+                obras.descripcion,
+                usuarios.nombre AS artista
+            FROM obras
+            INNER JOIN usuarios
+                ON obras.artista_id = usuarios.id
+            WHERE obras.id > ?
+            ORDER BY obras.id ASC
+            LIMIT 50
+        `, [ultimoId]);
+
+        // Enviar notificacion por cada obra nueva
+        for (const obra of obras) {
+
+            const mensaje = {
+                token: process.env.FCM_TEST_TOKEN,
+
+                notification: {
+                    title: "Nueva obra en Death-Art",
+                    body: `${obra.titulo} - ${obra.artista}`
+                },
+
+                android: {
+                    priority: "high",
+                    notification: {
+                        channelId: "death_art_notifications"
+                    }
+                },
+
+                data: {
+                    tipo: "nueva_obra",
+                    obra_id: String(obra.id),
+                    titulo: String(obra.titulo),
+                    artista: String(obra.artista)
+                }
+            };
+
+            // Firebase envia al smartwatch
+            await firebase.messaging().send(mensaje);
+
+            // Guardar el ID solo despues de enviar
+            await consultaNotificaciones(`
+                UPDATE control_notificaciones
+                SET ultimo_id = ?
+                WHERE id = 1
+            `, [obra.id]);
+
+            enviadas++;
+
+            console.log(
+                `Notificacion enviada: ${obra.titulo}`
+            );
+        }
+
+        res.json({
+            message: "Verificacion completada",
+            obras_detectadas: obras.length,
+            notificaciones_enviadas: enviadas
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Error en verificacion automatica:",
+            error
+        );
+
+        res.status(500).json({
+            message: "Error verificando publicaciones",
+            notificaciones_enviadas: enviadas
+        });
+
+    } finally {
+        verificacionActiva = false;
+    }
+});
+
+
+
+
 
 
 
