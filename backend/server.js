@@ -1597,6 +1597,60 @@ app.get("/chat/:remitente/:receptor", (req, res) => {
 
 });
 
+ 
+// ========================================
+// DEATH-ART SMART NOTIFICATIONS
+// OBTENER NUEVAS OBRAS
+// ========================================
+
+app.get("/notificaciones/obras", (req, res) => {
+
+    const desde = Number(req.query.desde ?? 0);
+
+    if (
+        !Number.isSafeInteger(desde) ||
+        desde < 0
+    ) {
+        return res.status(400).json({
+            message: "ID de referencia inválido"
+        });
+    }
+
+    const sql = `
+        SELECT
+            obras.id,
+            obras.titulo,
+            obras.descripcion,
+            obras.imagen,
+            usuarios.nombre AS artista
+        FROM obras
+        INNER JOIN usuarios
+            ON obras.artista_id = usuarios.id
+        WHERE obras.id > ?
+        ORDER BY obras.id ASC
+    `;
+
+    db.query(sql, [desde], (error, obras) => {
+
+        if (error) {
+            console.error(
+                "Error en notificaciones:",
+                error
+            );
+
+            return res.status(500).json({
+                message: "Error al consultar notificaciones"
+            });
+        }
+
+        res.json({
+            nuevas: obras.length,
+            obras: obras
+        });
+    });
+});
+
+
 
 
 
