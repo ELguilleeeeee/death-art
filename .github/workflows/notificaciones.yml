@@ -1,27 +1,26 @@
-<CodeBlock language="yaml" editable>
+
 name: Death-Art Notificaciones
 
-
 on:
-schedule:
-- cron: "*/5 * * * *"
+  schedule:
+    - cron: "*/5 * * * *"
 
-workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
-verificar-obras:
-runs-on: ubuntu-latest
+  verificar-obras:
+    runs-on: ubuntu-latest
 
-steps:
-- name: Revisar publicaciones nuevas
-env:
-NOTIFY_SECRET: ${{ secrets.NOTIFY_ADMIN_SECRET }}
-run: |
-curl --fail-with-body 
---retry 2 
---connect-timeout 30 
---max-time 180 
--X POST 
--H "x-notification-secret: ${NOTIFY_SECRET}" 
-"https://death-art.onrender.com/notificaciones/verificar"
-</CodeBlock>
+    steps:
+      - name: Revisar publicaciones nuevas
+        env:
+          NOTIFY_SECRET: ${{ secrets.NOTIFY_ADMIN_SECRET }}
+
+        run: |
+          curl --fail-with-body \
+            --retry 2 \
+            --connect-timeout 30 \
+            --max-time 180 \
+            -X POST \
+            -H "x-notification-secret: ${NOTIFY_SECRET}" \
+            "https://death-art.onrender.com/notificaciones/verificar"
