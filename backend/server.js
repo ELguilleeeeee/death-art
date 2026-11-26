@@ -109,6 +109,46 @@ app.post("/register", async (req, res) => {
 
     } = req.body;
 
+    // Validar campos obligatorios
+    if (
+      typeof name !== "string" ||
+      !name.trim() ||
+      typeof email !== "string" ||
+      !email.trim() ||
+      typeof password !== "string" ||
+      !password
+    ) {
+      return res.status(400).json({
+        message: "Completa todos los campos obligatorios."
+      });
+    }
+
+    // Validar correo electrónico
+    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailValido.test(email.trim())) {
+      return res.status(400).json({
+        message: "Ingresa un correo electrónico válido."
+      });
+    }
+
+    // Validar contraseña
+    if (password.length < 8) {
+      return res.status(400).json({
+        message: "La contraseña debe tener al menos 8 caracteres."
+      });
+    }
+
+    // Impedir registros con roles no permitidos
+    const rolesPermitidos = ["usuario", "artista"];
+
+    if (!rolesPermitidos.includes(accountType)) {
+      return res.status(400).json({
+        message: "Tipo de cuenta no permitido."
+      });
+    }
+
+
     // Encriptar contraseña
 
     const hashedPassword = await bcrypt.hash(
