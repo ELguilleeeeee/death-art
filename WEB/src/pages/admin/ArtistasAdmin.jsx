@@ -14,17 +14,35 @@ export default function ArtistasAdmin() {
 
   }, []);
 
-  const obtenerArtistas = () => {
+  
+const obtenerArtistas = async () => {
+  try {
+    const response = await fetch(
+      "https://death-art.onrender.com/artistas-pendientes"
+    );
 
-    fetch("https://death-art.onrender.com/artistas-pendientes")
+    if (!response.ok) {
+      throw new Error(
+        `Error al consultar artistas: HTTP ${response.status}`
+      );
+    }
 
-      .then(res => res.json())
+    const data = await response.json();
 
-      .then(data => setArtistas(data))
+    if (!Array.isArray(data)) {
+      throw new Error("Respuesta inesperada del servidor");
+    }
 
-      .catch(err => console.log(err));
+    setArtistas(data);
 
-  };
+  } catch (error) {
+    console.error("Error al obtener artistas:", error);
+
+    setArtistas([]);
+    alert("No se pudieron cargar las solicitudes de artistas.");
+  }
+};
+
 
   const aprobar = async(id)=>{
 
