@@ -21,9 +21,36 @@ const handleChange = (e) => {
     [e.target.name]: e.target.value
   });
 };
+
 const handleRegister = async () => {
 
+  // Comprobar los campos obligatorios
+  if (
+    !formData.name.trim() ||
+    !formData.accountType ||
+    !formData.email.trim() ||
+    !formData.password
+  ) {
+    alert("Completa todos los campos obligatorios.");
+    return;
+  }
+
+  // Validar el formato del correo
+  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailValido.test(formData.email.trim())) {
+    alert("Ingresa un correo electrónico válido.");
+    return;
+  }
+
+  // Comprobar la longitud de la contraseña
+  if (formData.password.length < 8) {
+    alert("La contraseña debe tener al menos 8 caracteres.");
+    return;
+  }
+
   try {
+
 
     const response = await fetch(
       "https://death-art.onrender.com/register",
@@ -42,7 +69,7 @@ const handleRegister = async () => {
 
 if (response.ok) {
 
-  if (formData.accountType === "organizador") {
+  if (formData.accountType === "artista") {
 
     alert(
       "Tu solicitud fue enviada correctamente.\n\nUn administrador revisará tu registro. Recibirás un correo electrónico cuando tu solicitud sea aprobada o rechazada."
