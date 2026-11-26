@@ -13,15 +13,40 @@ export default function DashboardAdmin() {
 
     });
 
-    useEffect(()=>{
+    
+useEffect(() => {
+  const obtenerDashboard = async () => {
+    try {
+      const response = await fetch(
+        "https://death-art.onrender.com/admin/dashboard"
+      );
 
-        fetch("https://death-art.onrender.com/admin/dashboard")
+      if (!response.ok) {
+        throw new Error(
+          `Error HTTP ${response.status}`
+        );
+      }
 
-        .then(res=>res.json())
+      const data = await response.json();
 
-        .then(data=>setDatos(data));
+      setDatos({
+        artistas: Number(data.artistas) || 0,
+        usuarios: Number(data.usuarios) || 0,
+        eventos: Number(data.eventos) || 0,
+        galeria: Number(data.galeria) || 0
+      });
 
-    },[]);
+    } catch (error) {
+      console.error(
+        "Error al cargar dashboard:",
+        error
+      );
+    }
+  };
+
+  obtenerDashboard();
+}, []);
+
 
     return(
 
