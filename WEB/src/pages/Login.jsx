@@ -20,9 +20,25 @@ const handleChange = (e) => {
   });
 
 };
+
 const handleLogin = async () => {
 
+  // Verificar que los campos no estén vacíos
+  if (!loginData.email.trim() || !loginData.password) {
+    alert("Ingresa tu correo y contraseña.");
+    return;
+  }
+
+  // Validar el formato del correo
+  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailValido.test(loginData.email.trim())) {
+    alert("Ingresa un correo electrónico válido.");
+    return;
+  }
+
   try {
+
 
     const response = await fetch(
       "https://death-art.onrender.com/login",
