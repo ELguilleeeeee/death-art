@@ -1,5 +1,10 @@
+
 import "../styles/Sidebar.css";
 import { useNavigate } from "react-router-dom";
+import {
+  obtenerUsuario,
+  cerrarSesionLocal
+} from "../services/auth";
 
 export default function SidebarAdmin({
   isOpen,
@@ -7,22 +12,21 @@ export default function SidebarAdmin({
   seccion,
   setSeccion
 }) {
-
   const navigate = useNavigate();
 
-  const usuario = JSON.parse(
-    localStorage.getItem("usuario")
-  );
+  const usuario = obtenerUsuario();
 
+  // Cerrar sesión
   const cerrarSesion = () => {
-
     const confirmar = window.confirm(
       "¿Quieres cerrar la sesión actual?"
     );
 
     if (!confirmar) return;
 
-    localStorage.removeItem("usuario");
+    cerrarSesionLocal();
+
+    closeSidebar();
 
     navigate("/login", { replace: true });
   };
@@ -36,12 +40,7 @@ export default function SidebarAdmin({
         />
       )}
 
-      <div
-        className={`sidebar ${
-          isOpen ? "open" : ""
-        }`}
-      >
-
+      <div className={`sidebar ${isOpen ? "open" : ""}`}>
         <button
           className="close-btn"
           onClick={closeSidebar}
@@ -49,9 +48,7 @@ export default function SidebarAdmin({
           ✕
         </button>
 
-        <h2>
-          Administrador
-        </h2>
+        <h2>Administrador</h2>
 
         <p
           style={{
@@ -129,7 +126,6 @@ export default function SidebarAdmin({
         >
           🚪 Cerrar sesión
         </button>
-
       </div>
     </>
   );

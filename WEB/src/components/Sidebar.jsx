@@ -1,5 +1,9 @@
 import "./../styles/Sidebar.css";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  obtenerUsuario,
+  cerrarSesionLocal
+} from "../services/auth";
 
 export default function Sidebar({
   isOpen,
@@ -8,9 +12,7 @@ export default function Sidebar({
 
   const navigate = useNavigate();
 
-  const usuario = JSON.parse(
-    localStorage.getItem("usuario")
-  );
+  const usuario = obtenerUsuario();
 
   const cerrarSesion = () => {
 
@@ -20,7 +22,7 @@ export default function Sidebar({
 
     if (!confirmar) return;
 
-    localStorage.removeItem("usuario");
+    cerrarSesionLocal();
 
     navigate("/login", { replace: true });
   };

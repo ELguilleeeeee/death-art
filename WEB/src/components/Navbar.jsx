@@ -1,14 +1,13 @@
 import logo from "../assets/3.png";
 import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { obtenerUsuario, cerrarSesionLocal } from "../services/auth";
 
 export default function Navbar({ openSidebar }) {
 
   const navigate = useNavigate();
 
-  const usuario = JSON.parse(
-    localStorage.getItem("usuario")
-  );
+  const usuario = obtenerUsuario();
 
   const cerrarSesion = () => {
 
@@ -18,7 +17,7 @@ export default function Navbar({ openSidebar }) {
 
     if (!confirmar) return;
 
-    localStorage.removeItem("usuario");
+    cerrarSesionLocal();
 
     navigate("/login", { replace: true });
 
