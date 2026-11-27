@@ -3,11 +3,18 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
+const { crearToken } = require("./authTokens");
+const { autenticar, permitirRoles } = require("./authMiddleware");
+const { cookieSesion, opcionesCookie, limpiarCookie, validarOrigen } = require("./sessionHttp");
 const enviarCorreo = require("./mailer");
 
 const multer = require("multer");
 const { v2: cloudinary } = require("cloudinary");
 
+
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+  throw new Error("Configure JWT_SECRET (mínimo 32 caracteres) en Render y en el backend local.");
+}
 
 const app = express();
 
@@ -34,7 +41,8 @@ origin: (origin, callback) => {
 
     allowedHeaders: [
       "Content-Type",
-      "Authorization"
+      "Authorization",
+      "X-Requested-With"
     ]
   })
 );
@@ -43,6 +51,13 @@ app.use(express.json());
 
 
 const db = require("./db");
+
+function consulta(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.query(sql, params, (err, rows) => err ? reject(err) : resolve(rows));
+  });
+}
+
 
 const iniciarFirebase = require("./firebase");
 const firebase = iniciarFirebase();
@@ -352,154 +367,73 @@ app.post("/register", async (req, res) => {
 });
 
 
-app.post("/login", async (req, res) => {
-
-  try {
-
-    const {
-      email,
-      password
-    } = req.body;
-
-    const sql = `
-      SELECT
-
-        u.id,
-        u.nombre,
-        u.correo,
-        u.password,
-        u.estado,
-
-        r.nombre AS rol
-
-      FROM usuarios u
-
-      INNER JOIN usuario_rol ur
-
-        ON u.id = ur.usuario_id
-
-      INNER JOIN roles r
-
-        ON ur.rol_id = r.id
-
-      WHERE u.correo = ?
-    `;
-
-    db.query(
-
-      sql,
-
-      [email],
-
-      async (err, result) => {
-
-        if (err) {
-
-          console.log(err);
-
-          return res.status(500).json({
-
-            message: "Error del servidor"
-
-          });
-
-        }
-
-        if (result.length === 0) {
-
-          return res.status(404).json({
-
-            message: "Usuario no encontrado"
-
-          });
-
-        }
-
-        const user = result[0];
-
-        const passwordMatch = await bcrypt.compare(
-
-          password,
-
-          user.password
-
-        );
-
-        if (!passwordMatch) {
-
-          return res.status(401).json({
-
-            message: "Contraseña incorrecta"
-
-          });
-
-        }
-
-        if (
-
-          user.rol === "artista" &&
-
-          user.estado === "pendiente"
-
-        ) {
-
-          return res.status(403).json({
-
-            message:
-              "Tu cuenta está pendiente de aprobación"
-
-          });
-
-        }
-
-        if (
-
-          user.rol === "artista" &&
-
-          user.estado === "rechazado"
-
-        ) {
-
-          return res.status(403).json({
-
-            message:
-              "Tu solicitud fue rechazada"
-
-          });
-
-        }
-
-        res.status(200).json({
-
-          message: "Inicio de sesión correcto",
-
-          id: user.id,
-
-          nombre: user.nombre,
-
-          tipo: user.rol
-
-        });
-
-      }
-
-    );
-
-  } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-
-      message: "Error interno"
-
-    });
-
+// Todos los accesos desde la web pasan por /api/* (Rewrite en Render).
+// Los datos de autorización siempre se resuelven en el servidor.
+app.post("/login", validarOrigen, async (req, res) => {
+  const { email, password } = req.body ?? {};
+  if (typeof email !== "string" || !email.trim() || typeof password !== "string" || !password) {
+    return res.status(400).json({ message: "Ingresa correo y contraseña." });
   }
 
+  try {
+    const usuarios = await consulta(`
+      SELECT u.id, u.nombre, u.password, u.estado, r.nombre AS rol
+      FROM usuarios u
+      INNER JOIN usuario_rol ur ON u.id = ur.usuario_id
+      INNER JOIN roles r ON ur.rol_id = r.id
+      WHERE u.correo = ?
+      LIMIT 1
+    `, [email.trim()]);
+
+    if (!usuarios.length || !(await bcrypt.compare(password, usuarios[0].password))) {
+      return res.status(401).json({ message: "Correo o contraseña incorrectos." });
+    }
+    const user = usuarios[0];
+    if (user.rol === "artista" && user.estado !== "aprobado") {
+      return res.status(403).json({
+        message: user.estado === "pendiente"
+          ? "Tu cuenta está pendiente de aprobación"
+          : "Tu solicitud fue rechazada"
+      });
+    }
+    const { token, identificador, expiracion } = crearToken(Number(user.id));
+    await consulta(`
+      INSERT INTO sesiones_usuario (usuario_id, identificador, fecha_expiracion)
+      VALUES (?, ?, ?)
+    `, [user.id, identificador, expiracion.toISOString().slice(0, 19).replace("T", " ")]);
+
+    res.cookie(cookieSesion, token, opcionesCookie);
+    return res.status(200).json({
+      message: "Inicio de sesión correcto", id: user.id,
+      nombre: user.nombre, tipo: user.rol
+    });
+  } catch (error) {
+    console.error("Error de login:", error);
+    return res.status(500).json({ message: "Error del servidor" });
+  }
 });
 
-app.get("/artistas-pendientes", (req, res) => {
+app.get("/auth/me", autenticar, (req, res) => {
+  res.set("Cache-Control", "no-store");
+  return res.json(req.usuario);
+});
+
+app.post("/logout", validarOrigen, autenticar, async (req, res) => {
+  try {
+    await consulta(`
+      UPDATE sesiones_usuario SET fecha_revocacion = UTC_TIMESTAMP()
+      WHERE identificador = ? AND usuario_id = ? AND fecha_revocacion IS NULL
+    `, [req.auth.identificador, req.auth.usuarioId]);
+    res.clearCookie(cookieSesion, limpiarCookie);
+    return res.json({ message: "Sesión cerrada" });
+  } catch (error) {
+    console.error("Error de logout:", error);
+    return res.status(500).json({ message: "No se pudo cerrar la sesión" });
+  }
+});
+
+
+app.get("/artistas-pendientes", autenticar, permitirRoles("admin"), (req, res) => {
 
   const sql = `
     SELECT
@@ -530,7 +464,7 @@ app.get("/artistas-pendientes", (req, res) => {
 
 });
 
-app.put("/aprobar-artista/:id", (req, res) => {
+app.put("/aprobar-artista/:id", validarOrigen, autenticar, permitirRoles("admin"), (req, res) => {
 
   const { id } = req.params;
 
@@ -618,7 +552,7 @@ Equipo Death-Art`
 
 });
 
-app.put("/rechazar-artista/:id", (req, res) => {
+app.put("/rechazar-artista/:id", validarOrigen, autenticar, permitirRoles("admin"), (req, res) => {
 
   const { id } = req.params;
 
@@ -706,7 +640,7 @@ Equipo Death-Art`
 
 });
 
-app.get("/test-email", async (req, res) => {
+app.get("/test-email", autenticar, permitirRoles("admin"), async (req, res) => {
 
   try {
 
@@ -1052,7 +986,7 @@ app.put(
 
 
 
-app.get("/admin/dashboard", (req, res) => {
+app.get("/admin/dashboard", autenticar, permitirRoles("admin"), (req, res) => {
 
   const dashboard = {};
 
