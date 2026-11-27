@@ -8,10 +8,39 @@ const enviarCorreo = require("./mailer");
 const multer = require("multer");
 const { v2: cloudinary } = require("cloudinary");
 
+
 const app = express();
 
-app.use(cors());
+const origenesPermitidos = [
+  "https://death-art-web.onrender.com",
+  "http://localhost:5173"
+];
+
+app.use(
+  cors({
+    
+origin: (origin, callback) => {
+  if (!origin || origenesPermitidos.includes(origin)) {
+    return callback(null, true);
+  }
+
+  return callback(null, false);
+},
+
+
+    credentials: true,
+
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization"
+    ]
+  })
+);
+
 app.use(express.json());
+
 
 const db = require("./db");
 
