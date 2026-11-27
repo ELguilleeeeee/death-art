@@ -1915,6 +1915,173 @@ app.post("/notificaciones/verificar", async (req, res) => {
 
 
 
+/* ==========================================
+   ADMINISTRADOR - GESTIÓN DE USUARIOS
+========================================== */
+
+// Consultar usuarios normales y artistas
+app.get(
+  "/admin/usuarios",
+  autenticar,
+  permitirRoles("admin"),
+  async (req, res) => {
+    try {
+      const usuarios = await consulta(`
+        SELECT id, nombre, correo, tipo, estado,
+               fecha_registro
+        FROM usuarios
+        WHERE tipo IN ('usuario', 'artista')
+        ORDER BY fecha_registro DESC, id DESC
+      `);
+
+      res.json(usuarios);
+    } catch (error) {
+      console.error("Error consultando usuarios:", error);
+      res.status(500).json({
+        message: "No se pudieron consultar los usuarios"
+      });
+    }
+  }
+);
+
+// Editar usuario
+app.put(
+  "/admin/usuarios/:id",
+  validarOrigen,
+  autenticar,
+  permitirRoles("admin"),
+  async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const { nombre, correo, estado } = req.body || {};
+
+      if (!Number.isSafeInteger(id) || id <= 0) {
+        return res.status(400).json({
+          message: "ID inválido"
+        });
+      }
+
+      if (
+        typeof nombre !== "string" ||
+        !nombre.trim() ||
+        nombre.trim().length > 100 ||
+        typeof correo !== "string" ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim()) ||
+        correo.trim().length > 150
+      ) {
+        return res.status(400).json({
+          message: "Nombre o correo inválido"
+        });
+      }
+
+      const resultado = await consulta(
+        `SELECT tipo FROM usuarios
+         WHERE id = ? AND tipo IN ('usuario','artista')`,
+        [id]
+      );
+
+      if (!resultado.length) {
+        return res.status(404).json({
+          message: "Usuario no encontrado"
+        });
+      }
+
+      const tipo = resultado[0].tipo;
+
+      if (
+        tipo === "artista" &&
+        !["pendiente", "aprobado", "rechazado"].includes(estado)
+      ) {
+        return res.status(400).json({
+          message: "Estado no permitido"
+        });
+      }
+
+      const estadoFinal =
+        tipo === "usuario" ? "aprobado" : estado;
+
+      await consulta(
+        `UPDATE usuarios
+         SET nombre = ?, correo = ?, estado = ?
+         WHERE id = ? AND tipo IN ('usuario','artista')`,
+        [
+          nombre.trim(),
+          correo.trim().toLowerCase(),
+          estadoFinal,
+          id
+        ]
+      );
+
+      res.json({
+        message: "Usuario actualizado correctamente"
+      });
+
+    } catch (error) {
+      console.error("Error editando usuario:", error);
+
+      res.status(error.code === "ER_DUP_ENTRY" ? 409 : 500)
+        .json({
+          message: error.code === "ER_DUP_ENTRY"
+            ? "Ese correo ya está registrado"
+            : "No se pudo actualizar el usuario"
+        });
+    }
+  }
+);
+
+
+
+
+//ADMIN
+
+// Eliminar usuario
+app.delete(
+  "/admin/usuarios/:id",
+  validarOrigen,
+  autenticar,
+  permitirRoles("admin"),
+  async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+
+      if (!Number.isSafeInteger(id) || id <= 0) {
+        return res.status(400).json({
+          message: "ID inválido"
+        });
+      }
+
+      const resultado = await consulta(
+        `DELETE FROM usuarios
+         WHERE id = ?
+         AND tipo IN ('usuario', 'artista')`,
+        [id]
+      );
+
+      if (resultado.affectedRows === 0) {
+        return res.status(404).json({
+          message: "Usuario no encontrado"
+        });
+      }
+
+      res.json({
+        message: "Usuario eliminado correctamente"
+      });
+
+    } catch (error) {
+      console.error("Error eliminando usuario:", error);
+
+      res.status(
+        error.code === "ER_ROW_IS_REFERENCED_2" ? 409 : 500
+      ).json({
+        message:
+          error.code === "ER_ROW_IS_REFERENCED_2"
+            ? "Este usuario tiene registros relacionados. No se puede eliminar directamente."
+            : "No se pudo eliminar el usuario"
+      });
+    }
+  }
+);
+
 
 
 
